@@ -118,7 +118,7 @@ h2 {
 
 .segmented-control {
   display: inline-grid;
-  grid-template-columns: repeat(2, minmax(92px, 1fr));
+  grid-template-columns: repeat(2, minmax(190px, 1fr));
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -134,6 +134,7 @@ h2 {
   font-size: 13px;
   font-weight: 900;
   padding: 0 12px;
+  white-space: nowrap;
 }
 
 .segment-button.active {
@@ -155,7 +156,7 @@ h2 {
 }
 
 .field-grid,
-.target-grid,
+target-grid,
 .compact-table {
   display: grid;
   gap: 12px;
