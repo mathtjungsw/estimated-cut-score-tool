@@ -156,7 +156,7 @@ h2 {
 }
 
 .field-grid,
-target-grid,
+.target-grid,
 .compact-table {
   display: grid;
   gap: 12px;
