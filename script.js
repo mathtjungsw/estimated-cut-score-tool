@@ -7,7 +7,9 @@ const difficulties = [
   { key: "saHard", label: "서술형(어려움)", defaultWeight: 10 },
 ];
 
-const groups = ["A", "B", "C", "D", "E"];
+const allGroups = ["A", "B", "C", "D", "E"];
+let groups = [...allGroups];
+let includeEGroup = true;
 const defaultTargets = { A: 84, B: 68, C: 51, D: 35, E: 19 };
 const stepValues = Array.from({ length: 21 }, (_, index) => index * 5);
 const maxTeacherSpread = 10;
@@ -28,6 +30,7 @@ const targetInputsEl = document.querySelector("#targetInputs");
 const calculateBtn = document.querySelector("#calculateBtn");
 const normalizeWeightsBtn = document.querySelector("#normalizeWeights");
 const copyExcelBtn = document.querySelector("#copyExcelBtn");
+const eModeButtons = document.querySelectorAll("[data-e-mode]");
 const statusPill = document.querySelector("#statusPill");
 const scoreStrip = document.querySelector("#scoreStrip");
 const resultWrap = document.querySelector("#resultWrap");
@@ -78,6 +81,25 @@ function renderTargets() {
       `,
     )
     .join("");
+}
+
+function resetResult() {
+  scoreStrip.innerHTML = "";
+  latestExcelText = "";
+  copyExcelBtn.disabled = true;
+  statusPill.textContent = "대기 중";
+  statusPill.className = "status-pill";
+  resultWrap.innerHTML = `<p class="empty-state">배점과 희망 점수를 확인한 뒤 계산을 누르면 교사별 5점 단위 입력표가 표시됩니다.</p>`;
+}
+
+function setEGroupMode(mode) {
+  includeEGroup = mode === "include";
+  groups = includeEGroup ? [...allGroups] : allGroups.filter((group) => group !== "E");
+  eModeButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.eMode === mode);
+  });
+  renderTargets();
+  resetResult();
 }
 
 function readInputs() {
@@ -143,7 +165,7 @@ function difficultyGroupSpread(assignments, difficultyIndex, group) {
 function normalizeVector(vector) {
   const normalized = {};
   let ceiling = 100;
-  groups.forEach((group) => {
+  allGroups.forEach((group) => {
     normalized[group] = clamp(roundToFive(Math.min(vector[group], ceiling)));
     ceiling = normalized[group];
   });
@@ -159,9 +181,9 @@ function orderedDifficultyValue(target, level) {
 
 function makeOrderedDifficultyVectors(targets) {
   return [
-    normalizeVector(Object.fromEntries(groups.map((group) => [group, orderedDifficultyValue(targets[group], "easy")]))),
-    normalizeVector(Object.fromEntries(groups.map((group) => [group, orderedDifficultyValue(targets[group], "medium")]))),
-    normalizeVector(Object.fromEntries(groups.map((group) => [group, orderedDifficultyValue(targets[group], "hard")]))),
+    normalizeVector(Object.fromEntries(allGroups.map((group) => [group, orderedDifficultyValue(targets[group] ?? defaultTargets[group], "easy")]))),
+    normalizeVector(Object.fromEntries(allGroups.map((group) => [group, orderedDifficultyValue(targets[group] ?? defaultTargets[group], "medium")]))),
+    normalizeVector(Object.fromEntries(allGroups.map((group) => [group, orderedDifficultyValue(targets[group] ?? defaultTargets[group], "hard")]))),
   ];
 }
 
@@ -171,7 +193,7 @@ function makeInitialAssignments(inputs) {
     difficulties.map((_, difficultyIndex) => {
       const vector = { ...orderedVectors[difficultyIndex % 3] };
       if (difficultyIndex >= 3) {
-        groups.forEach((group) => {
+        allGroups.forEach((group) => {
           vector[group] = clamp(vector[group] - 5);
         });
       }
@@ -181,12 +203,12 @@ function makeInitialAssignments(inputs) {
 }
 
 function respectsRowOrder(vector) {
-  return groups.every((group, index) => index === 0 || vector[groups[index - 1]] >= vector[group]);
+  return allGroups.every((group, index) => index === 0 || vector[allGroups[index - 1]] >= vector[group]);
 }
 
 function respectsDifficultyOrder(assignments, teacherIndex) {
   return difficultyOrderSets.every(([easyIndex, mediumIndex, hardIndex]) =>
-    groups.every((group) => {
+    allGroups.every((group) => {
       const easy = assignments[teacherIndex][easyIndex][group];
       const medium = assignments[teacherIndex][mediumIndex][group];
       const hard = assignments[teacherIndex][hardIndex][group];
@@ -197,7 +219,7 @@ function respectsDifficultyOrder(assignments, teacherIndex) {
 
 function respectsTypeOrder(assignments, teacherIndex) {
   return typeOrderPairs.every(([mcIndex, writtenIndex]) =>
-    groups.every((group) => assignments[teacherIndex][mcIndex][group] >= assignments[teacherIndex][writtenIndex][group] + 5),
+    allGroups.every((group) => assignments[teacherIndex][mcIndex][group] >= assignments[teacherIndex][writtenIndex][group] + 5),
   );
 }
 
@@ -236,7 +258,7 @@ function optimize(inputs) {
   const vectorFromSet = (vectors, index) => {
     const vector = { ...vectors[index % 3] };
     if (index >= 3) {
-      groups.forEach((group) => {
+      allGroups.forEach((group) => {
         vector[group] = clamp(vector[group] - 5);
       });
     }
@@ -423,6 +445,9 @@ function normalizeWeights() {
 calculateBtn.addEventListener("click", calculate);
 normalizeWeightsBtn.addEventListener("click", normalizeWeights);
 copyExcelBtn.addEventListener("click", copyExcelText);
+eModeButtons.forEach((button) => {
+  button.addEventListener("click", () => setEGroupMode(button.dataset.eMode));
+});
 
 renderWeights();
 renderTargets();
