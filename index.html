@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>추정분할점수 역산 도구</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Estimated Cut Score Lab</p>
+            <h1>추정분할점수 역산 도구</h1>
+          </div>
+        </header>
+
+        <section class="panel controls-panel" aria-label="입력">
+          <div class="field-grid">
+            <label>
+              <span>교사 수</span>
+              <select id="teacherCount">
+                <option value="1">1명</option>
+                <option value="2">2명</option>
+                <option value="3">3명</option>
+                <option value="4" selected>4명</option>
+                <option value="5">5명</option>
+                <option value="6">6명</option>
+                <option value="7">7명</option>
+                <option value="8">8명</option>
+              </select>
+            </label>
+            <label>
+              <span>허용 오차</span>
+              <select id="tolerance">
+                <option value="0">정확히</option>
+                <option value="0.5">±0.5점</option>
+                <option value="1">±1점</option>
+                <option value="2" selected>±2점</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section class="two-column">
+          <section class="panel" aria-labelledby="weightsTitle">
+            <div class="section-head">
+              <h2 id="weightsTitle">난이도별 배점</h2>
+              <button class="ghost-action" id="normalizeWeights" type="button">100점 보정</button>
+            </div>
+            <div class="compact-table" id="weightInputs"></div>
+          </section>
+
+          <section class="panel" aria-labelledby="targetsTitle">
+            <div class="section-head">
+              <h2 id="targetsTitle">희망 추정분할점수</h2>
+            </div>
+            <div class="target-grid" id="targetInputs"></div>
+          </section>
+        </section>
+
+        <div class="calculate-row">
+          <button class="primary-action" id="calculateBtn" type="button">계산</button>
+        </div>
+
+        <section class="panel result-panel" aria-live="polite">
+          <div class="result-head">
+            <div>
+              <p class="eyebrow">Result</p>
+              <h2>계산 결과</h2>
+            </div>
+            <div class="status-pill" id="statusPill">대기 중</div>
+          </div>
+          <div class="score-strip" id="scoreStrip"></div>
+          <div class="result-actions">
+            <button class="ghost-action" id="copyExcelBtn" type="button" disabled>엑셀용 복사</button>
+          </div>
+          <div class="teacher-table-wrap" id="resultWrap">
+            <p class="empty-state">배점과 희망 점수를 확인한 뒤 계산을 누르면 교사별 5점 단위 입력표가 표시됩니다.</p>
+          </div>
+        </section>
+      </section>
+    </main>
+    <script src="./script.js"></script>
+  </body>
+</html>
