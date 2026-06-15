@@ -116,6 +116,31 @@ h2 {
   margin-bottom: 14px;
 }
 
+.segmented-control {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(92px, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.segment-button {
+  min-height: 36px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 0 12px;
+}
+
+.segment-button.active {
+  background: var(--accent);
+  color: #fff;
+}
+
 .two-column {
   display: grid;
   grid-template-columns: minmax(0, 1.18fr) minmax(340px, 0.82fr);
@@ -374,6 +399,10 @@ select:focus {
   .result-actions {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .segmented-control {
+    width: 100%;
   }
 
   .two-column {
